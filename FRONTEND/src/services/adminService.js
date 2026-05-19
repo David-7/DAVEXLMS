@@ -33,7 +33,12 @@ export const adminService = {
   },
 
   upgradeToPremium: async (userId) => {
-    const response = await api.patch(`/admin/users/${userId}/upgrade-premium`);
+    const response = await api.patch(`/admin/students/${userId}/upgrade-premium`);
+    return response.data;
+  },
+
+  getDashboardStats: async () => {
+    const response = await api.get('/admin/dashboard-stats');
     return response.data;
   },
 

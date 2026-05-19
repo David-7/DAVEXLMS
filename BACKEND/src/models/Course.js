@@ -75,6 +75,15 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    duration: {
+      type: String,
+      trim: true,
+    },
+    level: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'advanced'],
+      default: 'beginner',
+    },
     lessons: [lessonSchema],
     status: {
       type: String,

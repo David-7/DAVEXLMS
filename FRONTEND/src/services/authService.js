@@ -4,9 +4,10 @@ export const authService = {
   login: async (identifier, password) => {
     const response = await api.post('/auth/login', { identifier, password });
     if (response.data.success) {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('accessToken', response.data.accessToken);
+      sessionStorage.setItem('refreshToken', response.data.refreshToken);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('isLoggedIn', 'true');
     }
     return response.data;
   },
@@ -18,9 +19,10 @@ export const authService = {
       confirmPassword,
     });
     if (response.data.success) {
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('accessToken', response.data.accessToken);
+      sessionStorage.setItem('refreshToken', response.data.refreshToken);
+      sessionStorage.setItem('user', JSON.stringify(response.data.user));
+      sessionStorage.setItem('isLoggedIn', 'true');
     }
     return response.data;
   },
@@ -46,18 +48,19 @@ export const authService = {
     try {
       await api.post('/auth/logout');
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('isLoggedIn');
     }
   },
 
   getCurrentUser: () => {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('accessToken');
+    return !!sessionStorage.getItem('accessToken') && !!sessionStorage.getItem('isLoggedIn');
   },
 };

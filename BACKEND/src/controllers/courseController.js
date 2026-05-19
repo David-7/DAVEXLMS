@@ -5,22 +5,26 @@ import { paginate, buildPaginationResponse } from '../utils/helpers.js';
 import { logActivity, getClientInfo } from '../utils/activityLogger.js';
 
 export const createCourse = asyncHandler(async (req, res, next) => {
-  const { name, description, instructor } = req.body;
+  const { name, title, description, instructor, duration, level } = req.body;
 
-  if (!name) {
+  const courseName = name || title;
+
+  if (!courseName) {
     return next(new AppError('Course name is required', 400));
   }
 
-  const existingCourse = await Course.findOne({ name, isDeleted: false });
+  const existingCourse = await Course.findOne({ name: courseName, isDeleted: false });
 
   if (existingCourse) {
     return next(new AppError('Course with this name already exists', 400));
   }
 
   const course = await Course.create({
-    name,
+    name: courseName,
     description,
     instructor,
+    duration,
+    level,
   });
 
   const clientInfo = getClientInfo(req);
@@ -191,6 +195,7 @@ export const addLesson = asyncHandler(async (req, res, next) => {
 
 export const markTopicCovered = asyncHandler(async (req, res, next) => {
   const { courseId, lessonId, topicId } = req.params;
+  const isUnmarking = req.path.includes('unmark-covered');
 
   const course = await Course.findOne({ _id: courseId, isDeleted: false });
 
@@ -214,14 +219,19 @@ export const markTopicCovered = asyncHandler(async (req, res, next) => {
     return next(new AppError('Topic not found', 404));
   }
 
-  topic.isCovered = true;
-  topic.coveredAt = new Date();
+  if (isUnmarking) {
+    topic.isCovered = false;
+    topic.coveredAt = null;
+  } else {
+    topic.isCovered = true;
+    topic.coveredAt = new Date();
+  }
 
   await course.save();
 
   res.status(200).json({
     success: true,
-    message: 'Topic marked as covered',
+    message: isUnmarking ? 'Topic unmarked' : 'Topic marked as covered',
     data: course,
   });
 });

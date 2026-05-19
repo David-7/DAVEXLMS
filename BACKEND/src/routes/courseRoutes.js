@@ -24,7 +24,12 @@ router.delete('/:courseId', authorize('super_admin', 'admin'), deleteCourse);
 
 router.post('/:courseId/lessons', authorize('super_admin', 'admin', 'instructor'), addLesson);
 router.patch(
-  '/:courseId/lessons/:lessonId/topics/:topicId/covered',
+  '/:courseId/lessons/:lessonId/topics/:topicId/mark-covered',
+  authorize('super_admin', 'admin', 'instructor'),
+  markTopicCovered
+);
+router.patch(
+  '/:courseId/lessons/:lessonId/topics/:topicId/unmark-covered',
   authorize('super_admin', 'admin', 'instructor'),
   markTopicCovered
 );

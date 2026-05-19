@@ -3,28 +3,12 @@ import { Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuthStore } from '../store/useAuthStore';
-import { useSocket } from '../hooks/useSocket';
 
 const Chat = () => {
   const { user } = useAuthStore();
-  const socket = useSocket();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit('join-room', { room: 'general', userId: user?._id });
-
-      socket.on('new-message', (message) => {
-        setMessages((prev) => [...prev, message]);
-      });
-
-      return () => {
-        socket.off('new-message');
-      };
-    }
-  }, [socket, user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,15 +16,17 @@ const Chat = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !socket) return;
+    if (!newMessage.trim()) return;
 
-    socket.emit('send-message', {
-      sender: user?._id,
+    const message = {
+      sender: { _id: user?._id, fullName: user?.fullName },
       content: newMessage,
-      room: 'general',
-    });
+      timestamp: new Date(),
+    };
 
+    setMessages((prev) => [...prev, message]);
     setNewMessage('');
+    toast.success('Message sent (Demo mode - Socket.io not connected)');
   };
 
   return (

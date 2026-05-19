@@ -13,6 +13,8 @@ import { mongoSanitizer, xssSanitizer, sanitizeInput } from './middleware/saniti
 
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import instructorRoutes from './routes/instructorRoutes.js';
+import studentRoutes from './routes/studentRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import challengeRoutes from './routes/challengeRoutes.js';
 import leaderboardRoutes from './routes/leaderboardRoutes.js';
@@ -20,6 +22,7 @@ import flashPrizeRoutes from './routes/flashPrizeRoutes.js';
 import announcementRoutes from './routes/announcementRoutes.js';
 import scheduleRoutes from './routes/scheduleRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import certificateRoutes from './routes/certificateRoutes.js';
 
 const app = express();
 
@@ -84,6 +87,8 @@ app.get('/health', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/instructor', instructorRoutes);
+app.use('/api/v1/student', studentRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/challenges', challengeRoutes);
 app.use('/api/v1/leaderboard', leaderboardRoutes);
@@ -91,6 +96,7 @@ app.use('/api/v1/flash-prizes', flashPrizeRoutes);
 app.use('/api/v1/announcements', announcementRoutes);
 app.use('/api/v1/schedules', scheduleRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/certificates', certificateRoutes);
 
 app.all('*', (req, res) => {
   res.status(404).json({

@@ -110,7 +110,6 @@ const courseSchema = new mongoose.Schema(
   }
 );
 
-courseSchema.index({ name: 1 });
 courseSchema.index({ instructor: 1 });
 courseSchema.index({ status: 1 });
 

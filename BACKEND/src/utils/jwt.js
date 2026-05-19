@@ -25,15 +25,21 @@ export const sendTokenResponse = (user, statusCode, res) => {
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
-  const cookieOptions = {
-    expires: new Date(Date.now() + config.jwtCookieExpire * 24 * 60 * 60 * 1000),
+  res.cookie('token', accessToken, {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
     sameSite: 'none',
-  };
+    partitioned: true,
+    maxAge: 15 * 60 * 1000,
+  });
 
-  res.cookie('token', accessToken, cookieOptions);
-  res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'none',
+    partitioned: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   const userResponse = {
     id: user._id,

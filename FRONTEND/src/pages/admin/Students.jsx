@@ -40,7 +40,7 @@ const Students = () => {
   const fetchCourses = async () => {
     try {
       const response = await courseService.getCourses();
-      setCourses(response.data || []);
+      setCourses(response.data?.data || response.data || []);
     } catch (error) {
       console.error('Failed to fetch courses');
     }
@@ -288,7 +288,7 @@ const Students = () => {
               <option value="">Select Course</option>
               {courses.map((course) => (
                 <option key={course._id} value={course._id}>
-                  {course.title}
+                  {course.name || course.title}
                 </option>
               ))}
             </select>

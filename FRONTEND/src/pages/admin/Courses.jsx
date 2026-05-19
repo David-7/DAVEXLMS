@@ -32,7 +32,7 @@ const Courses = () => {
   const fetchCourses = async () => {
     try {
       const response = await courseService.getCourses();
-      setCourses(response.data || []);
+      setCourses(response.data?.data || response.data || []);
     } catch (error) {
       toast.error('Failed to fetch courses');
     } finally {
@@ -81,7 +81,7 @@ const Courses = () => {
   };
 
   const handleDelete = async (course) => {
-    if (window.confirm(`Delete ${course.title}? This action cannot be undone.`)) {
+    if (window.confirm(`Delete ${course.name || course.title}? This action cannot be undone.`)) {
       try {
         await courseService.deleteCourse(course._id);
         toast.success('Course deleted successfully');
@@ -95,7 +95,7 @@ const Courses = () => {
   const openEditModal = (course) => {
     setEditingCourse(course);
     setFormData({
-      title: course.title,
+      title: course.name || course.title,
       description: course.description,
       duration: course.duration || '',
       level: course.level || 'beginner',
@@ -130,7 +130,8 @@ const Courses = () => {
   const columns = [
     {
       header: 'Title',
-      accessor: 'title',
+      accessor: 'name',
+      render: (row) => row.name || row.title,
     },
     {
       header: 'Description',

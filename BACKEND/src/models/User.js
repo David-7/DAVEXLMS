@@ -112,9 +112,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.index({ email: 1 });
-userSchema.index({ accountNumber: 1 });
-userSchema.index({ admissionNumber: 1 });
 userSchema.index({ role: 1, status: 1 });
 
 userSchema.virtual('isLocked').get(function () {

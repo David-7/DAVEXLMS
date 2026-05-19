@@ -24,6 +24,8 @@ import AdminCourses from '../pages/admin/Courses';
 import AdminChallenges from '../pages/admin/Challenges';
 import AdminAnnouncements from '../pages/admin/Announcements';
 
+import Chat from '../pages/Chat';
+
 import Unauthorized from '../pages/Unauthorized';
 import NotFound from '../pages/NotFound';
 
@@ -192,6 +194,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
             <AdminAnnouncements />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute allowedRoles={['student', 'instructor', 'admin', 'super_admin']}>
+            <Chat />
           </ProtectedRoute>
         }
       />

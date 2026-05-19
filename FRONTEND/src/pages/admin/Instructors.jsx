@@ -5,19 +5,23 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
 import adminService from '../../services/adminService';
+import courseService from '../../services/courseService';
 
 const Instructors = () => {
   const [instructors, setInstructors] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    assignedCourse: '',
   });
 
   useEffect(() => {
     fetchInstructors();
+    fetchCourses();
   }, []);
 
   const fetchInstructors = async () => {
@@ -28,6 +32,15 @@ const Instructors = () => {
       toast.error('Failed to fetch instructors');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await courseService.getCourses();
+      setCourses(response.data?.data || response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch courses');
     }
   };
 
@@ -207,6 +220,22 @@ const Instructors = () => {
               className="input-field"
               disabled={editingInstructor}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Assign Course</label>
+            <select
+              value={formData.assignedCourse}
+              onChange={(e) => setFormData({ ...formData, assignedCourse: e.target.value })}
+              className="input-field"
+            >
+              <option value="">Select Course (Optional)</option>
+              {courses.map((course) => (
+                <option key={course._id} value={course._id}>
+                  {course.name || course.title}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex gap-2 justify-end">

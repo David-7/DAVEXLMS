@@ -45,6 +45,9 @@ const DashboardLayout = ({ children }) => {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/instructor/dashboard' },
         { icon: BookOpen, label: 'Courses', path: '/instructor/courses' },
         { icon: Users, label: 'Students', path: '/instructor/students' },
+        { icon: Calendar, label: 'Schedule', path: '/instructor/schedule' },
+        { icon: Award, label: 'Certificates', path: '/instructor/certificates' },
+        { icon: MessageSquare, label: 'Chat', path: '/chat' },
       ];
     } else if (user?.role === 'admin' || user?.role === 'super_admin') {
       return [
@@ -54,6 +57,7 @@ const DashboardLayout = ({ children }) => {
         { icon: BookOpen, label: 'Courses', path: '/admin/courses' },
         { icon: Trophy, label: 'Challenges', path: '/admin/challenges' },
         { icon: Bell, label: 'Announcements', path: '/admin/announcements' },
+        { icon: MessageSquare, label: 'Chat', path: '/chat' },
       ];
     }
     return [];
@@ -141,14 +145,14 @@ const DashboardLayout = ({ children }) => {
         </div>
       </aside>
 
-      <main className="lg:ml-64 min-h-screen pt-16 lg:pt-0 bg-dark-950">
+      <main className="lg:ml-64 min-h-screen pt-16 lg:pt-0 bg-white dark:bg-dark-950">
         <div className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-green-600 dark:text-white">
                 Welcome, {user?.fullName}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 capitalize">
+              <p className="text-gray-900 dark:text-gray-400 capitalize">
                 {user?.role?.replace('_', ' ')}
                 {user?.plan === 'premium' && (
                   <span className="ml-2 px-2 py-1 text-xs font-semibold rounded-full premium-gradient text-white">

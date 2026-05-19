@@ -10,13 +10,25 @@ const leaderboardEntrySchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  weeklyPoints: {
+  monthlyPoints: {
+    type: Number,
+    default: 0,
+  },
+  loginPoints: {
+    type: Number,
+    default: 0,
+  },
+  challengePoints: {
     type: Number,
     default: 0,
   },
   challengesCompleted: {
     type: Number,
     default: 0,
+  },
+  lastMonthlyReset: {
+    type: Date,
+    default: Date.now,
   },
   badges: [{
     name: {

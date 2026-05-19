@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Leaderboard from '../models/Leaderboard.js';
 import { AppError, asyncHandler } from '../utils/errorHandler.js';
 import { sendTokenResponse, verifyRefreshToken, generateAccessToken } from '../utils/jwt.js';
 import { validatePassword } from '../middleware/validator.js';
@@ -62,7 +63,34 @@ export const login = asyncHandler(async (req, res, next) => {
 
   await user.resetLoginAttempts();
   user.lastLogin = Date.now();
+  
+  const today = new Date().toISOString().split('T')[0];
+  const isNewLoginToday = user.lastLoginDate !== today;
+  
+  if (isNewLoginToday) {
+    user.lastLoginDate = today;
+  }
+  
   await user.save();
+
+  if (user.role === 'student' && isNewLoginToday) {
+    let leaderboardEntry = await Leaderboard.findOne({ student: user._id });
+    
+    if (!leaderboardEntry) {
+      leaderboardEntry = await Leaderboard.create({
+        student: user._id,
+        loginPoints: 1,
+        monthlyPoints: 1,
+        totalPoints: 1,
+      });
+    } else {
+      leaderboardEntry.loginPoints += 1;
+      leaderboardEntry.monthlyPoints += 1;
+      leaderboardEntry.totalPoints += 1;
+      leaderboardEntry.lastUpdated = Date.now();
+      await leaderboardEntry.save();
+    }
+  }
 
   const clientInfo = getClientInfo(req);
   await logActivity({

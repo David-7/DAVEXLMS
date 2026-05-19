@@ -14,3 +14,4 @@ logs/
 *.swo
 coverage/
 uploads/
+*.md

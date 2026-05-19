@@ -29,7 +29,7 @@ export const sendTokenResponse = (user, statusCode, res) => {
     expires: new Date(Date.now() + config.jwtCookieExpire * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: config.nodeEnv === 'production',
-    sameSite: 'strict',
+    sameSite: 'none',
   };
 
   res.cookie('token', accessToken, cookieOptions);

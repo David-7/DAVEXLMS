@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Trophy, Award, TrendingUp, Calendar, Bell } from 'lucide-react';
+import { BookOpen, Trophy, Award, TrendingUp, Calendar, Bell, MessageSquare, User } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { useAuthStore } from '../../store/useAuthStore';
 import api from '../../api/axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState(null);
+  const { user } = useAuthStore();
+  const [stats, setStats] = useState({
+    points: 0,
+    newMessages: 0,
+    awards: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,6 +21,13 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
+      const response = await api.get('/leaderboard');
+      const myEntry = response.data?.data?.find(entry => entry.student?._id === user?._id);
+      setStats({
+        points: myEntry?.monthlyPoints || 0,
+        newMessages: 0,
+        awards: myEntry?.badges?.length || 0,
+      });
       setLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -75,7 +88,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Points</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">0</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{stats.points}</p>
               </div>
               <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
                 <Award className="text-yellow-600 dark:text-yellow-400" size={24} />
@@ -91,11 +104,49 @@ const Dashboard = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Progress</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">0%</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">New Messages</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{stats.newMessages}</p>
               </div>
               <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <TrendingUp className="text-purple-600 dark:text-purple-400" size={24} />
+                <MessageSquare className="text-purple-600 dark:text-purple-400" size={24} />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="card"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Assigned Instructor</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">
+                  {user?.assignedInstructor?.fullName || 'Not Assigned'}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <User className="text-blue-600 dark:text-blue-400" size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="card"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Won Awards</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{stats.awards}</p>
+              </div>
+              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <Trophy className="text-green-600 dark:text-green-400" size={24} />
               </div>
             </div>
           </motion.div>

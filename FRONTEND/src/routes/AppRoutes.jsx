@@ -9,6 +9,7 @@ import StudentDashboard from '../pages/student/Dashboard';
 import StudentCourses from '../pages/student/Courses';
 import StudentChallenges from '../pages/student/Challenges';
 import StudentLeaderboard from '../pages/student/Leaderboard';
+import StudentCertificates from '../pages/student/Certificates';
 import StudentAnnouncements from '../pages/student/Announcements';
 import StudentProfile from '../pages/student/Profile';
 
@@ -93,6 +94,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['student']}>
             <StudentLeaderboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/certificates"
+        element={
+          <ProtectedRoute allowedRoles={['student']}>
+            <StudentCertificates />
           </ProtectedRoute>
         }
       />

@@ -131,6 +131,100 @@ export const createInstructor = asyncHandler(async (req, res, next) => {
   });
 });
 
+export const updateStudent = asyncHandler(async (req, res, next) => {
+  const { userId } = req.params;
+  const { fullName, email, admissionNumber, assignedCourse, assignedInstructor, plan } = req.body;
+
+  const student = await User.findOne({ _id: userId, role: 'student', isDeleted: false });
+
+  if (!student) {
+    return next(new AppError('Student not found', 404));
+  }
+
+  if (fullName) student.fullName = fullName;
+  if (email && email !== student.email) {
+    if (!validateEmail(email)) {
+      return next(new AppError('Invalid email format', 400));
+    }
+    const existingEmail = await User.findOne({ email: email.toLowerCase(), _id: { $ne: userId } });
+    if (existingEmail) {
+      return next(new AppError('Email already exists', 400));
+    }
+    student.email = email.toLowerCase();
+  }
+  if (admissionNumber && admissionNumber !== student.admissionNumber) {
+    if (!validateAdmissionNumber(admissionNumber)) {
+      return next(new AppError('Invalid admission number format', 400));
+    }
+    const existingAdmission = await User.findOne({ admissionNumber: admissionNumber.toUpperCase(), _id: { $ne: userId } });
+    if (existingAdmission) {
+      return next(new AppError('Admission number already exists', 400));
+    }
+    student.admissionNumber = admissionNumber.toUpperCase();
+  }
+  if (assignedCourse !== undefined) student.assignedCourse = assignedCourse || null;
+  if (assignedInstructor !== undefined) student.assignedInstructor = assignedInstructor || null;
+  if (plan) student.plan = plan;
+
+  await student.save();
+
+  const clientInfo = getClientInfo(req);
+  await logActivity({
+    user: req.user._id,
+    action: 'admin_action',
+    description: `Updated student: ${student.email}`,
+    ...clientInfo,
+    metadata: { studentId: student._id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Student updated successfully',
+    data: student,
+  });
+});
+
+export const updateInstructor = asyncHandler(async (req, res, next) => {
+  const { userId } = req.params;
+  const { fullName, email, assignedCourse } = req.body;
+
+  const instructor = await User.findOne({ _id: userId, role: 'instructor', isDeleted: false });
+
+  if (!instructor) {
+    return next(new AppError('Instructor not found', 404));
+  }
+
+  if (fullName) instructor.fullName = fullName;
+  if (email && email !== instructor.email) {
+    if (!validateEmail(email)) {
+      return next(new AppError('Invalid email format', 400));
+    }
+    const existingEmail = await User.findOne({ email: email.toLowerCase(), _id: { $ne: userId } });
+    if (existingEmail) {
+      return next(new AppError('Email already exists', 400));
+    }
+    instructor.email = email.toLowerCase();
+  }
+  if (assignedCourse !== undefined) instructor.assignedCourse = assignedCourse || null;
+
+  await instructor.save();
+
+  const clientInfo = getClientInfo(req);
+  await logActivity({
+    user: req.user._id,
+    action: 'admin_action',
+    description: `Updated instructor: ${instructor.email}`,
+    ...clientInfo,
+    metadata: { instructorId: instructor._id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Instructor updated successfully',
+    data: instructor,
+  });
+});
+
 export const getAllStudents = asyncHandler(async (req, res, next) => {
   const { page = 1, limit = 20, search, course, plan, status } = req.query;
   const { skip, limit: limitNum } = paginate(page, limit);

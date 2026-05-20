@@ -2,6 +2,8 @@ import express from 'express';
 import {
   createStudent,
   createInstructor,
+  updateStudent,
+  updateInstructor,
   getAllStudents,
   getAllInstructors,
   blockUser,
@@ -21,6 +23,8 @@ router.post('/students', createStudent);
 router.post('/instructors', createInstructor);
 router.get('/students', getAllStudents);
 router.get('/instructors', getAllInstructors);
+router.patch('/students/:userId', updateStudent);
+router.patch('/instructors/:userId', updateInstructor);
 router.patch('/users/:userId/block', blockUser);
 router.patch('/users/:userId/unblock', unblockUser);
 router.patch('/users/:userId/upgrade-premium', upgradeToPremium);

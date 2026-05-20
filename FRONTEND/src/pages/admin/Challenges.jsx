@@ -15,9 +15,11 @@ const Challenges = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    type: 'question',
     points: 10,
-    difficulty: 'easy',
-    deadline: '',
+    difficulty: 'beginner',
+    startDate: new Date().toISOString().split('T')[0],
+    expiryDate: '',
   });
 
   useEffect(() => {
@@ -70,9 +72,11 @@ const Challenges = () => {
     setFormData({
       title: challenge.title,
       description: challenge.description,
+      type: challenge.type || 'question',
       points: challenge.points,
       difficulty: challenge.difficulty,
-      deadline: challenge.deadline ? format(new Date(challenge.deadline), 'yyyy-MM-dd') : '',
+      startDate: challenge.startDate ? format(new Date(challenge.startDate), 'yyyy-MM-dd') : new Date().toISOString().split('T')[0],
+      expiryDate: challenge.expiryDate ? format(new Date(challenge.expiryDate), 'yyyy-MM-dd') : '',
     });
     setIsModalOpen(true);
   };
@@ -82,9 +86,11 @@ const Challenges = () => {
     setFormData({
       title: '',
       description: '',
+      type: 'question',
       points: 10,
-      difficulty: 'easy',
-      deadline: '',
+      difficulty: 'beginner',
+      startDate: new Date().toISOString().split('T')[0],
+      expiryDate: '',
     });
   };
 
@@ -212,24 +218,51 @@ const Challenges = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-2">Type</label>
+            <select
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              className="input-field"
+              required
+            >
+              <option value="question">Question</option>
+              <option value="troubleshooting">Troubleshooting</option>
+              <option value="practical">Practical</option>
+              <option value="coding">Coding</option>
+            </select>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-2">Difficulty</label>
             <select
               value={formData.difficulty}
               onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
               className="input-field"
             >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Deadline (Optional)</label>
+            <label className="block text-sm font-medium mb-2">Start Date</label>
             <input
               type="date"
-              value={formData.deadline}
-              onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+              required
+              value={formData.startDate}
+              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+              className="input-field"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Expiry Date</label>
+            <input
+              type="date"
+              required
+              value={formData.expiryDate}
+              onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
               className="input-field"
             />
           </div>

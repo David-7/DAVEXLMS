@@ -23,6 +23,7 @@ import announcementRoutes from './routes/announcementRoutes.js';
 import scheduleRoutes from './routes/scheduleRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import certificateRoutes from './routes/certificateRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
@@ -97,6 +98,7 @@ app.use('/api/v1/announcements', announcementRoutes);
 app.use('/api/v1/schedules', scheduleRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/certificates', certificateRoutes);
+app.use('/api/v1/chat', chatRoutes);
 
 app.all('*', (req, res) => {
   res.status(404).json({

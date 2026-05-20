@@ -14,7 +14,7 @@ const Announcements = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    priority: 'normal',
+    priority: 'medium',
     targetAudience: 'all',
   });
 
@@ -62,7 +62,7 @@ const Announcements = () => {
     setFormData({
       title: '',
       content: '',
-      priority: 'normal',
+      priority: 'medium',
       targetAudience: 'all',
     });
   };
@@ -184,9 +184,10 @@ const Announcements = () => {
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
               className="input-field"
             >
-              <option value="normal">Normal</option>
+              <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
+              <option value="urgent">Urgent</option>
             </select>
           </div>
 
@@ -198,8 +199,9 @@ const Announcements = () => {
               className="input-field"
             >
               <option value="all">All Users</option>
-              <option value="student">Students Only</option>
-              <option value="instructor">Instructors Only</option>
+              <option value="students">Students Only</option>
+              <option value="instructors">Instructors Only</option>
+              <option value="premium">Premium Only</option>
             </select>
           </div>
 

@@ -35,6 +35,7 @@ const DashboardLayout = ({ children }) => {
         { icon: BookOpen, label: 'Courses', path: '/student/courses' },
         { icon: Trophy, label: 'Challenges', path: '/student/challenges' },
         { icon: Award, label: 'Leaderboard', path: '/student/leaderboard' },
+        { icon: Calendar, label: 'Schedule', path: '/student/schedule' },
         { icon: Award, label: 'Certificates', path: '/student/certificates' },
         { icon: MessageSquare, label: 'Chat', path: '/chat' },
         { icon: Bell, label: 'Announcements', path: '/student/announcements' },

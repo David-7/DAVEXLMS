@@ -7,7 +7,7 @@ import api from '../../api/axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
-  const { user } = useAuthStore();
+  const { user, refreshUser } = useAuthStore();
   const [stats, setStats] = useState({
     points: 0,
     newMessages: 0,
@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    refreshUser();
     fetchDashboardData();
   }, []);
 

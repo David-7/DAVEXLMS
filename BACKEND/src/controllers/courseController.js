@@ -193,6 +193,87 @@ export const addLesson = asyncHandler(async (req, res, next) => {
   });
 });
 
+export const updateLesson = asyncHandler(async (req, res, next) => {
+  const { courseId, lessonId } = req.params;
+  const { title, description, topics } = req.body;
+
+  const course = await Course.findOne({ _id: courseId, isDeleted: false });
+
+  if (!course) {
+    return next(new AppError('Course not found', 404));
+  }
+
+  if (req.user.role === 'instructor' && course.instructor && course.instructor.toString() !== req.user._id.toString()) {
+    return next(new AppError('Not authorized to update lessons in this course', 403));
+  }
+
+  const lesson = course.lessons.id(lessonId);
+
+  if (!lesson) {
+    return next(new AppError('Lesson not found', 404));
+  }
+
+  if (title) lesson.title = title;
+  if (description !== undefined) lesson.description = description;
+  if (topics) lesson.topics = topics;
+
+  await course.save();
+
+  const clientInfo = getClientInfo(req);
+  await logActivity({
+    user: req.user._id,
+    action: 'instructor_action',
+    description: `Updated lesson "${lesson.title}" in course: ${course.name}`,
+    ...clientInfo,
+    metadata: { courseId: course._id, lessonId: lesson._id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Lesson updated successfully',
+    data: course,
+  });
+});
+
+export const deleteLesson = asyncHandler(async (req, res, next) => {
+  const { courseId, lessonId } = req.params;
+
+  const course = await Course.findOne({ _id: courseId, isDeleted: false });
+
+  if (!course) {
+    return next(new AppError('Course not found', 404));
+  }
+
+  if (req.user.role === 'instructor' && course.instructor && course.instructor.toString() !== req.user._id.toString()) {
+    return next(new AppError('Not authorized to delete lessons from this course', 403));
+  }
+
+  const lesson = course.lessons.id(lessonId);
+
+  if (!lesson) {
+    return next(new AppError('Lesson not found', 404));
+  }
+
+  const lessonTitle = lesson.title;
+  lesson.remove();
+  await course.save();
+
+  const clientInfo = getClientInfo(req);
+  await logActivity({
+    user: req.user._id,
+    action: 'instructor_action',
+    description: `Deleted lesson "${lessonTitle}" from course: ${course.name}`,
+    ...clientInfo,
+    metadata: { courseId: course._id },
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Lesson deleted successfully',
+    data: course,
+  });
+});
+
 export const markTopicCovered = asyncHandler(async (req, res, next) => {
   const { courseId, lessonId, topicId } = req.params;
   const isUnmarking = req.path.includes('unmark-covered');

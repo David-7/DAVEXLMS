@@ -10,6 +10,7 @@ const Courses = () => {
   const [loading, setLoading] = useState(true);
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [editingLesson, setEditingLesson] = useState(null);
   const [lessonData, setLessonData] = useState({
     title: '',
     description: '',
@@ -48,7 +49,19 @@ const Courses = () => {
 
   const openAddLessonModal = (course) => {
     setSelectedCourse(course);
+    setEditingLesson(null);
     setLessonData({ title: '', description: '', topics: '' });
+    setIsLessonModalOpen(true);
+  };
+
+  const openEditLessonModal = (course, lesson) => {
+    setSelectedCourse(course);
+    setEditingLesson(lesson);
+    setLessonData({
+      title: lesson.title,
+      description: lesson.description,
+      topics: lesson.topics?.map(t => t.title).join('\n') || '',
+    });
     setIsLessonModalOpen(true);
   };
 
@@ -60,17 +73,39 @@ const Courses = () => {
         .filter((t) => t.trim())
         .map((title) => ({ title: title.trim(), isCovered: false }));
 
-      await courseService.addLesson(selectedCourse._id, {
-        title: lessonData.title,
-        description: lessonData.description,
-        topics,
-      });
-      toast.success('Lesson added successfully');
+      if (editingLesson) {
+        await courseService.updateLesson(selectedCourse._id, editingLesson._id, {
+          title: lessonData.title,
+          description: lessonData.description,
+          topics,
+        });
+        toast.success('Lesson updated successfully');
+      } else {
+        await courseService.addLesson(selectedCourse._id, {
+          title: lessonData.title,
+          description: lessonData.description,
+          topics,
+        });
+        toast.success('Lesson added successfully');
+      }
       setIsLessonModalOpen(false);
+      setEditingLesson(null);
       setLessonData({ title: '', description: '', topics: '' });
       fetchCourses();
     } catch (error) {
-      toast.error('Failed to add lesson');
+      toast.error(editingLesson ? 'Failed to update lesson' : 'Failed to add lesson');
+    }
+  };
+
+  const handleDeleteLesson = async (courseId, lessonId) => {
+    if (window.confirm('Are you sure you want to delete this lesson?')) {
+      try {
+        await courseService.deleteLesson(courseId, lessonId);
+        toast.success('Lesson deleted successfully');
+        fetchCourses();
+      } catch (error) {
+        toast.error('Failed to delete lesson');
+      }
     }
   };
 
@@ -118,9 +153,27 @@ const Courses = () => {
                         key={lesson._id}
                         className="bg-gray-100 dark:bg-dark-800 rounded-lg p-4"
                       >
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
-                          {lesson.title}
-                        </h4>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            {lesson.title}
+                          </h4>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => openEditLessonModal(course, lesson)}
+                              className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                              title="Edit Lesson"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLesson(course._id, lesson._id)}
+                              className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                              title="Delete Lesson"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
                         {lesson.description && (
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                             {lesson.description}
@@ -181,9 +234,10 @@ const Courses = () => {
         isOpen={isLessonModalOpen}
         onClose={() => {
           setIsLessonModalOpen(false);
+          setEditingLesson(null);
           setLessonData({ title: '', description: '', topics: '' });
         }}
-        title="Add New Lesson"
+        title={editingLesson ? 'Edit Lesson' : 'Add New Lesson'}
       >
         <form onSubmit={handleAddLesson} className="space-y-4">
           <div>

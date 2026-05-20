@@ -6,6 +6,8 @@ import {
   updateCourse,
   deleteCourse,
   addLesson,
+  updateLesson,
+  deleteLesson,
   markTopicCovered,
   addResource,
 } from '../controllers/courseController.js';
@@ -23,6 +25,8 @@ router.patch('/:courseId', authorize('super_admin', 'admin'), updateCourse);
 router.delete('/:courseId', authorize('super_admin', 'admin'), deleteCourse);
 
 router.post('/:courseId/lessons', authorize('super_admin', 'admin', 'instructor'), addLesson);
+router.patch('/:courseId/lessons/:lessonId', authorize('super_admin', 'admin', 'instructor'), updateLesson);
+router.delete('/:courseId/lessons/:lessonId', authorize('super_admin', 'admin', 'instructor'), deleteLesson);
 router.patch(
   '/:courseId/lessons/:lessonId/topics/:topicId/mark-covered',
   authorize('super_admin', 'admin', 'instructor'),

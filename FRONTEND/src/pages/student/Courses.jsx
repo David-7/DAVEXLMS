@@ -5,21 +5,26 @@ import { useAuthStore } from '../../store/useAuthStore';
 import api from '../../api/axios';
 
 const Courses = () => {
-  const { user } = useAuthStore();
+  const { user, refreshUser } = useAuthStore();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.assignedCourse) {
-      fetchCourse();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
+    const loadData = async () => {
+      await refreshUser();
+      if (user?.assignedCourse) {
+        fetchCourse();
+      } else {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const fetchCourse = async () => {
     try {
-      const response = await api.get(`/courses/${user.assignedCourse}`);
+      const courseId = typeof user.assignedCourse === 'object' ? user.assignedCourse._id : user.assignedCourse;
+      const response = await api.get(`/courses/${courseId}`);
       setCourse(response.data?.data || response.data);
     } catch (error) {
       console.error('Failed to fetch course');

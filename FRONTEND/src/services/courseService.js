@@ -31,6 +31,16 @@ export const courseService = {
     return response.data;
   },
 
+  updateLesson: async (courseId, lessonId, lessonData) => {
+    const response = await api.patch(`/courses/${courseId}/lessons/${lessonId}`, lessonData);
+    return response.data;
+  },
+
+  deleteLesson: async (courseId, lessonId) => {
+    const response = await api.delete(`/courses/${courseId}/lessons/${lessonId}`);
+    return response.data;
+  },
+
   addResource: async (courseId, lessonId, resourceData) => {
     const response = await api.post(`/courses/${courseId}/lessons/${lessonId}/resources`, resourceData);
     return response.data;

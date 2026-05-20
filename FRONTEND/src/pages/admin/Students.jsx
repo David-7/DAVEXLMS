@@ -10,6 +10,7 @@ import courseService from '../../services/courseService';
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -18,12 +19,14 @@ const Students = () => {
     email: '',
     admissionNumber: '',
     assignedCourse: '',
+    assignedInstructor: '',
     plan: 'basic',
   });
 
   useEffect(() => {
     fetchStudents();
     fetchCourses();
+    fetchInstructors();
   }, []);
 
   const fetchStudents = async () => {
@@ -43,6 +46,15 @@ const Students = () => {
       setCourses(response.data?.data || response.data || []);
     } catch (error) {
       console.error('Failed to fetch courses');
+    }
+  };
+
+  const fetchInstructors = async () => {
+    try {
+      const response = await adminService.getInstructors();
+      setInstructors(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch instructors');
     }
   };
 
@@ -141,7 +153,12 @@ const Students = () => {
     {
       header: 'Course',
       accessor: 'assignedCourse',
-      render: (row) => row.assignedCourse?.title || 'Not Assigned',
+      render: (row) => row.assignedCourse?.name || row.assignedCourse?.title || 'Not Assigned',
+    },
+    {
+      header: 'Instructor',
+      accessor: 'assignedInstructor',
+      render: (row) => row.assignedInstructor?.fullName || 'Not Assigned',
     },
     {
       header: 'Plan',
@@ -289,6 +306,22 @@ const Students = () => {
               {courses.map((course) => (
                 <option key={course._id} value={course._id}>
                   {course.name || course.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Assign Instructor</label>
+            <select
+              value={formData.assignedInstructor}
+              onChange={(e) => setFormData({ ...formData, assignedInstructor: e.target.value })}
+              className="input-field"
+            >
+              <option value="">Select Instructor (Optional)</option>
+              {instructors.map((instructor) => (
+                <option key={instructor._id} value={instructor._id}>
+                  {instructor.fullName}
                 </option>
               ))}
             </select>

@@ -23,6 +23,7 @@ import AdminDashboard from '../pages/admin/Dashboard';
 import AdminStudents from '../pages/admin/Students';
 import AdminInstructors from '../pages/admin/Instructors';
 import AdminCourses from '../pages/admin/Courses';
+import AdminStudentLessons from '../pages/admin/StudentLessons';
 import AdminChallenges from '../pages/admin/Challenges';
 import AdminAnnouncements from '../pages/admin/Announcements';
 
@@ -196,6 +197,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
             <AdminCourses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/student-lessons"
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+            <AdminStudentLessons />
           </ProtectedRoute>
         }
       />

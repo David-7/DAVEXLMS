@@ -162,7 +162,7 @@ export const addLesson = asyncHandler(async (req, res, next) => {
     return next(new AppError('Course not found', 404));
   }
 
-  if (req.user.role === 'instructor' && course.instructor.toString() !== req.user._id.toString()) {
+  if (req.user.role === 'instructor' && course.instructor && course.instructor.toString() !== req.user._id.toString()) {
     return next(new AppError('Not authorized to add lessons to this course', 403));
   }
 

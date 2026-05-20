@@ -55,6 +55,7 @@ const DashboardLayout = ({ children }) => {
         { icon: Users, label: 'Students', path: '/admin/students' },
         { icon: Users, label: 'Instructors', path: '/admin/instructors' },
         { icon: BookOpen, label: 'Courses', path: '/admin/courses' },
+        { icon: BookOpen, label: 'Student Lessons', path: '/admin/student-lessons' },
         { icon: Trophy, label: 'Challenges', path: '/admin/challenges' },
         { icon: Bell, label: 'Announcements', path: '/admin/announcements' },
         { icon: MessageSquare, label: 'Chat', path: '/chat' },

@@ -3,20 +3,29 @@ import { AppError, asyncHandler } from '../utils/errorHandler.js';
 import { paginate, buildPaginationResponse } from '../utils/helpers.js';
 
 export const createSchedule = asyncHandler(async (req, res, next) => {
-  const { date, time, venue, topic, instructor, course, requiredMaterials } = req.body;
+  const { title, description, day, startTime, endTime, course, date, time, venue, topic, instructor, requiredMaterials } = req.body;
 
-  if (!date || !time || !venue || !topic || !instructor || !course) {
-    return next(new AppError('Please provide all required fields', 400));
+  if (!title && !topic) {
+    return next(new AppError('Please provide a title or topic', 400));
+  }
+
+  if (!day && !date) {
+    return next(new AppError('Please provide a day or date', 400));
   }
 
   const schedule = await Schedule.create({
-    date,
-    time,
-    venue,
-    topic,
-    instructor,
-    course,
-    requiredMaterials,
+    title: title || topic,
+    description: description || '',
+    day: day || '',
+    startTime: startTime || time,
+    endTime: endTime || '',
+    date: date || new Date(),
+    time: time || startTime,
+    venue: venue || '',
+    topic: topic || title,
+    instructor: instructor || req.user._id,
+    course: course || req.user.assignedCourse,
+    requiredMaterials: requiredMaterials || [],
     createdBy: req.user._id,
   });
 

@@ -94,6 +94,7 @@ const Instructors = () => {
     setFormData({
       fullName: instructor.fullName,
       email: instructor.email,
+      assignedCourse: instructor.assignedCourse?._id || instructor.assignedCourse || '',
     });
     setIsModalOpen(true);
   };
@@ -103,6 +104,7 @@ const Instructors = () => {
     setFormData({
       fullName: '',
       email: '',
+      assignedCourse: '',
     });
   };
 

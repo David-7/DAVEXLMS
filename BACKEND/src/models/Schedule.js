@@ -2,37 +2,51 @@ import mongoose from 'mongoose';
 
 const scheduleSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    day: {
+      type: String,
+      trim: true,
+    },
+    startTime: {
+      type: String,
+      trim: true,
+    },
+    endTime: {
+      type: String,
+      trim: true,
+    },
     date: {
       type: Date,
-      required: [true, 'Session date is required'],
     },
     time: {
       type: String,
-      required: [true, 'Session time is required'],
     },
     venue: {
       type: String,
-      required: [true, 'Venue is required'],
       trim: true,
     },
     topic: {
       type: String,
-      required: [true, 'Topic is required'],
       trim: true,
     },
     instructor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
-      required: true,
     },
     requiredMaterials: {
-      type: String,
-      trim: true,
+      type: [String],
+      default: [],
     },
     status: {
       type: String,

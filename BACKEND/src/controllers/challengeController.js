@@ -160,67 +160,6 @@ export const submitChallenge = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const evaluateSubmission = asyncHandler(async (req, res, next) => {
-  const { challengeId, submissionId } = req.params;
-  const { status, pointsAwarded, feedback } = req.body;
-
-  if (!status || !['correct', 'partial', 'incorrect'].includes(status)) {
-    return next(new AppError('Invalid evaluation status', 400));
-  }
-
-  const challenge = await Challenge.findOne({ _id: challengeId, isDeleted: false });
-
-  if (!challenge) {
-    return next(new AppError('Challenge not found', 404));
-  }
-
-  const submission = challenge.submissions.id(submissionId);
-
-  if (!submission) {
-    return next(new AppError('Submission not found', 404));
-  }
-
-  submission.status = status;
-  submission.pointsAwarded = pointsAwarded || 0;
-  submission.feedback = feedback;
-  submission.evaluatedBy = req.user._id;
-  submission.evaluatedAt = new Date();
-
-  await challenge.save();
-
-  let leaderboard = await Leaderboard.findOne({ student: submission.student });
-
-  if (!leaderboard) {
-    leaderboard = await Leaderboard.create({
-      student: submission.student,
-      totalPoints: 0,
-      weeklyPoints: 0,
-      challengesCompleted: 0,
-    });
-  }
-
-  leaderboard.totalPoints += pointsAwarded || 0;
-  leaderboard.weeklyPoints += pointsAwarded || 0;
-  if (status === 'correct' || status === 'partial') {
-    leaderboard.challengesCompleted += 1;
-  }
-  leaderboard.lastUpdated = new Date();
-  await leaderboard.save();
-
-  await Notification.create({
-    recipient: submission.student,
-    type: 'leaderboard_update',
-    title: 'Challenge Evaluated',
-    message: `Your submission for "${challenge.title}" has been evaluated. You earned ${pointsAwarded || 0} points!`,
-    priority: 'medium',
-  });
-
-  res.status(200).json({
-    success: true,
-    message: 'Submission evaluated successfully',
-  });
-});
-
 export const deleteChallenge = asyncHandler(async (req, res, next) => {
   const { challengeId } = req.params;
 
@@ -236,64 +175,6 @@ export const deleteChallenge = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: 'Challenge deleted successfully',
-  });
-});
-
-export const submitChallenge = asyncHandler(async (req, res, next) => {
-  const { challengeId } = req.params;
-  const { answer } = req.body;
-
-  if (!answer || !answer.trim()) {
-    return next(new AppError('Answer is required', 400));
-  }
-
-  const challenge = await Challenge.findOne({ _id: challengeId, isDeleted: false });
-
-  if (!challenge) {
-    return next(new AppError('Challenge not found', 404));
-  }
-
-  if (new Date() > new Date(challenge.expiryDate)) {
-    return next(new AppError('Challenge has expired', 400));
-  }
-
-  const existingSubmission = challenge.submissions.find(
-    sub => sub.student.toString() === req.user._id.toString()
-  );
-
-  if (existingSubmission) {
-    return next(new AppError('You have already submitted this challenge', 400));
-  }
-
-  challenge.submissions.push({
-    student: req.user._id,
-    answer: answer.trim(),
-    status: 'pending',
-  });
-
-  await challenge.save();
-
-  await Notification.create({
-    user: challenge.createdBy,
-    title: 'New Challenge Submission',
-    message: `${req.user.fullName} submitted an answer for "${challenge.title}"`,
-    type: 'challenge',
-    relatedId: challenge._id,
-  });
-
-  const clientInfo = getClientInfo(req);
-  await logActivity({
-    user: req.user._id,
-    action: 'student_action',
-    description: `Submitted challenge: ${challenge.title}`,
-    ...clientInfo,
-    metadata: { challengeId: challenge._id },
-  });
-
-  res.status(201).json({
-    success: true,
-    message: 'Challenge submitted successfully',
-    data: challenge,
   });
 });
 

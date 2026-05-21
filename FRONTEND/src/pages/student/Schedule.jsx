@@ -10,16 +10,24 @@ const Schedule = () => {
 
   useEffect(() => {
     fetchSchedules();
+    
+    const interval = setInterval(() => {
+      fetchSchedules(true);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchSchedules = async () => {
+  const fetchSchedules = async (silent = false) => {
     try {
       const response = await api.get('/schedules');
       setSchedules(response.data?.data || []);
+      if (!silent) setLoading(false);
     } catch (error) {
-      console.error('Failed to fetch schedules');
-    } finally {
-      setLoading(false);
+      if (!silent) {
+        console.error('Failed to fetch schedules');
+        setLoading(false);
+      }
     }
   };
 

@@ -380,9 +380,13 @@ export const upgradeToPremium = asyncHandler(async (req, res, next) => {
 
 export const getDashboardStats = asyncHandler(async (req, res, next) => {
   const totalStudents = await User.countDocuments({ role: 'student', isDeleted: false });
-  const premiumUsers = await User.countDocuments({ role: 'student', plan: 'premium', isDeleted: false });
+  const activeStudents = await User.countDocuments({ role: 'student', isActive: true, isDeleted: false });
+  const premiumStudents = await User.countDocuments({ role: 'student', plan: 'premium', isDeleted: false });
+  const pendingActivations = await User.countDocuments({ role: 'student', isActive: false, isDeleted: false });
   const totalInstructors = await User.countDocuments({ role: 'instructor', isDeleted: false });
+  const activeInstructors = await User.countDocuments({ role: 'instructor', isActive: true, isDeleted: false });
   const totalCourses = await Course.countDocuments({ isDeleted: false });
+  const totalChallenges = await Challenge.countDocuments({ isDeleted: false });
   const activeChallenges = await Challenge.countDocuments({ status: 'active', isDeleted: false });
 
   const recentActivities = await ActivityLog.find()
@@ -390,15 +394,43 @@ export const getDashboardStats = asyncHandler(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .limit(10);
 
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  const monthlyActivity = await ActivityLog.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfMonth }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          week: { $week: '$createdAt' },
+          action: '$action'
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { '_id.week': 1 }
+    }
+  ]);
+
   res.status(200).json({
     success: true,
     data: {
       totalStudents,
-      premiumUsers,
+      activeStudents,
+      premiumStudents,
+      pendingActivations,
       totalInstructors,
+      activeInstructors,
       totalCourses,
+      totalChallenges,
       activeChallenges,
       recentActivities,
+      monthlyActivity,
     },
   });
 });

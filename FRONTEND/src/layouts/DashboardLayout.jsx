@@ -46,8 +46,9 @@ const DashboardLayout = ({ children }) => {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/instructor/dashboard' },
         { icon: BookOpen, label: 'Courses', path: '/instructor/courses' },
         { icon: Users, label: 'Students', path: '/instructor/students' },
+        { icon: Trophy, label: 'Challenges', path: '/instructor/challenges' },
+        { icon: Award, label: 'Submissions', path: '/instructor/submissions' },
         { icon: Calendar, label: 'Schedule', path: '/instructor/schedule' },
-        { icon: Award, label: 'Certificates', path: '/instructor/certificates' },
         { icon: MessageSquare, label: 'Chat', path: '/chat' },
       ];
     } else if (user?.role === 'admin' || user?.role === 'super_admin') {

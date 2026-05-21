@@ -1,13 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, Trophy, Bell } from 'lucide-react';
+import { Users, BookOpen, Trophy, Bell, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import adminService from '../../services/adminService';
+import { exportAllData } from '../../utils/exportData';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalStudents: 0,
+    activeStudents: 0,
+    premiumStudents: 0,
+    pendingActivations: 0,
     totalInstructors: 0,
+    activeInstructors: 0,
     totalCourses: 0,
     totalChallenges: 0,
   });
@@ -16,28 +23,40 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStats();
+    
+    const interval = setInterval(() => {
+      fetchStats(true);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchStats = async () => {
+  const fetchStats = async (silent = false) => {
     try {
       const response = await adminService.getDashboardStats();
-      setStats(response.data || {});
+      const data = response.data || {};
+      setStats(data);
       
-      const today = new Date();
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      const weeksInMonth = Math.ceil(daysInMonth / 7);
+      if (data.monthlyActivity && data.monthlyActivity.length > 0) {
+        const weeklyData = {};
+        data.monthlyActivity.forEach(item => {
+          const week = `Week ${item._id.week}`;
+          if (!weeklyData[week]) {
+            weeklyData[week] = { name: week, students: 0, courses: 0, challenges: 0 };
+          }
+          if (item._id.action === 'student_action') weeklyData[week].students += item.count;
+          if (item._id.action === 'course_action') weeklyData[week].courses += item.count;
+          if (item._id.action === 'challenge_action') weeklyData[week].challenges += item.count;
+        });
+        setActivityData(Object.values(weeklyData));
+      }
       
-      const mockActivity = Array.from({ length: weeksInMonth }, (_, i) => ({
-        name: `Week ${i + 1}`,
-        students: Math.floor(Math.random() * 20) + (i * 10),
-        courses: Math.floor(Math.random() * 5) + (i * 2),
-        challenges: Math.floor(Math.random() * 8) + (i * 3),
-      }));
-      setActivityData(mockActivity);
+      if (!silent) setLoading(false);
     } catch (error) {
-      console.error('Failed to fetch stats');
-    } finally {
-      setLoading(false);
+      if (!silent) {
+        console.error('Failed to fetch stats');
+        setLoading(false);
+      }
     }
   };
 
@@ -78,10 +97,30 @@ const Dashboard = () => {
     );
   }
 
+  const handleExportData = async () => {
+    toast.loading('Exporting data...');
+    const success = await exportAllData(api);
+    toast.dismiss();
+    if (success) {
+      toast.success('Data exported successfully! Check your downloads.');
+    } else {
+      toast.error('Failed to export data');
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-white">Admin Dashboard</h2>
+          <button
+            onClick={handleExportData}
+            className="btn-primary flex items-center gap-2"
+          >
+            <Download size={18} />
+            Export All Data
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => {

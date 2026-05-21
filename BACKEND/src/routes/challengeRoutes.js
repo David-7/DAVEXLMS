@@ -4,11 +4,10 @@ import {
   getAllChallenges,
   getChallengeById,
   submitChallenge,
-  evaluateSubmission,
+  gradeSubmission,
   deleteChallenge,
 } from '../controllers/challengeController.js';
 import { protect, authorize } from '../middleware/auth.js';
-import { challengeSubmissionLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -18,12 +17,12 @@ router.get('/', getAllChallenges);
 router.get('/:challengeId', getChallengeById);
 
 router.post('/', authorize('super_admin', 'admin', 'instructor'), createChallenge);
-router.post('/:challengeId/submit', challengeSubmissionLimiter, submitChallenge);
+router.post('/:challengeId/submit', authorize('student'), submitChallenge);
 router.patch(
-  '/:challengeId/submissions/:submissionId/evaluate',
+  '/:challengeId/submissions/:submissionId/grade',
   authorize('super_admin', 'admin', 'instructor'),
-  evaluateSubmission
+  gradeSubmission
 );
-router.delete('/:challengeId', authorize('super_admin', 'admin'), deleteChallenge);
+router.delete('/:challengeId', authorize('super_admin', 'admin', 'instructor'), deleteChallenge);
 
 export default router;

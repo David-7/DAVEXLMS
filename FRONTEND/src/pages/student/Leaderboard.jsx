@@ -12,16 +12,24 @@ const Leaderboard = () => {
 
   useEffect(() => {
     fetchLeaderboard();
+    
+    const interval = setInterval(() => {
+      fetchLeaderboard(true);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = async (silent = false) => {
     try {
       const response = await api.get('/leaderboard');
       setLeaderboard(response.data?.data || []);
+      if (!silent) setLoading(false);
     } catch (error) {
-      toast.error('Failed to fetch leaderboard');
-    } finally {
-      setLoading(false);
+      if (!silent) {
+        toast.error('Failed to fetch leaderboard');
+        setLoading(false);
+      }
     }
   };
 

@@ -8,14 +8,20 @@ export const getLeaderboard = asyncHandler(async (req, res, next) => {
 
   const sortField = type === 'weekly' ? 'weeklyPoints' : 'totalPoints';
 
-  const total = await Leaderboard.countDocuments();
   const leaderboard = await Leaderboard.find()
-    .populate('student', 'fullName admissionNumber profilePhoto plan')
-    .sort({ [sortField]: -1 })
-    .skip(skip)
-    .limit(limitNum);
+    .populate({
+      path: 'student',
+      match: { role: 'student', isActive: true },
+      select: 'fullName admissionNumber profilePhoto plan role'
+    })
+    .sort({ [sortField]: -1 });
 
-  const leaderboardWithRanks = leaderboard.map((entry, index) => ({
+  const filteredLeaderboard = leaderboard.filter(entry => entry.student !== null);
+  
+  const total = filteredLeaderboard.length;
+  const paginatedData = filteredLeaderboard.slice(skip, skip + limitNum);
+
+  const leaderboardWithRanks = paginatedData.map((entry, index) => ({
     ...entry.toObject(),
     rank: skip + index + 1,
   }));

@@ -31,8 +31,8 @@ export const challengeService = {
     return response.data;
   },
 
-  evaluateSubmission: async (challengeId, submissionId, evaluationData) => {
-    const response = await api.patch(`/challenges/${challengeId}/submissions/${submissionId}/evaluate`, evaluationData);
+  gradeSubmission: async (challengeId, submissionId, gradeData) => {
+    const response = await api.patch(`/challenges/${challengeId}/submissions/${submissionId}/grade`, gradeData);
     return response.data;
   },
 };

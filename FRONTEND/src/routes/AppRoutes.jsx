@@ -17,6 +17,8 @@ import StudentProfile from '../pages/student/Profile';
 import InstructorDashboard from '../pages/instructor/Dashboard';
 import InstructorCourses from '../pages/instructor/Courses';
 import InstructorStudents from '../pages/instructor/Students';
+import InstructorChallenges from '../pages/instructor/Challenges';
+import InstructorSubmissions from '../pages/instructor/Submissions';
 import InstructorSchedule from '../pages/instructor/Schedule';
 import InstructorCertificates from '../pages/instructor/Certificates';
 
@@ -157,6 +159,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['instructor']}>
             <InstructorStudents />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/challenges"
+        element={
+          <ProtectedRoute allowedRoles={['instructor']}>
+            <InstructorChallenges />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/submissions"
+        element={
+          <ProtectedRoute allowedRoles={['instructor']}>
+            <InstructorSubmissions />
           </ProtectedRoute>
         }
       />

@@ -18,6 +18,13 @@ const Dashboard = () => {
   useEffect(() => {
     refreshUser();
     fetchDashboardData();
+    
+    const interval = setInterval(() => {
+      refreshUser();
+      fetchDashboardData();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const [progressData, setProgressData] = useState([]);
